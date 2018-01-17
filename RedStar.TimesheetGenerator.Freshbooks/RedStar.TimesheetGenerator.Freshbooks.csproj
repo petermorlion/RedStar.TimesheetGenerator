@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Vooban.FreshBooks" Version="0.0.2.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj" />
   </ItemGroup>
 

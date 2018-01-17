@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace RedStar.TimesheetGenerator.Core
 {
     public interface ITimeTrackingSource
     {
-        IList<TimeTrackingEntry> GetEntries();
+        IList<TimeTrackingEntry> GetEntries(DateTime dateFrom, DateTime dateTo);
     }
 }
