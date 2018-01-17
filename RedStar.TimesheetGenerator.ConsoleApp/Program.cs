@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using RedStar.TimesheetGenerator.Core;
 using RedStar.TimesheetGenerator.Excel;
 using RedStar.TimesheetGenerator.Freshbooks;
@@ -21,7 +22,8 @@ namespace RedStar.TimesheetGenerator.ConsoleApp
 
             var entries = source.GetEntries(dateFrom, dateTo);
 
-            ITimesheetDestination destination = new ExcelDestination();
+            var fileDestination = new FileInfo(args[4]);
+            ITimesheetDestination destination = new ExcelDestination(fileDestination, month, year);
             destination.CreateTimesheet(entries);
         }
     }
