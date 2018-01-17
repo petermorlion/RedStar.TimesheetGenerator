@@ -5,6 +5,12 @@ VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedStar.TimesheetGenerator.ConsoleApp", "RedStar.TimesheetGenerator.ConsoleApp\RedStar.TimesheetGenerator.ConsoleApp.csproj", "{EFB20543-F447-4715-8162-157FDDB646AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedStar.TimesheetGenerator.Freshbooks", "RedStar.TimesheetGenerator.Freshbooks\RedStar.TimesheetGenerator.Freshbooks.csproj", "{FE327FF5-E31F-433A-BCA5-3235977AA22D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedStar.TimesheetGenerator.Core", "RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj", "{72A19E22-9044-4F0F-85A5-468200E6789F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedStar.TimesheetGenerator.Excel", "RedStar.TimesheetGenerator.Excel\RedStar.TimesheetGenerator.Excel.csproj", "{83D34229-4128-4107-8E2D-C64DA062E697}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{EFB20543-F447-4715-8162-157FDDB646AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFB20543-F447-4715-8162-157FDDB646AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFB20543-F447-4715-8162-157FDDB646AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE327FF5-E31F-433A-BCA5-3235977AA22D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE327FF5-E31F-433A-BCA5-3235977AA22D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE327FF5-E31F-433A-BCA5-3235977AA22D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE327FF5-E31F-433A-BCA5-3235977AA22D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72A19E22-9044-4F0F-85A5-468200E6789F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72A19E22-9044-4F0F-85A5-468200E6789F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72A19E22-9044-4F0F-85A5-468200E6789F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72A19E22-9044-4F0F-85A5-468200E6789F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D34229-4128-4107-8E2D-C64DA062E697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D34229-4128-4107-8E2D-C64DA062E697}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D34229-4128-4107-8E2D-C64DA062E697}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D34229-4128-4107-8E2D-C64DA062E697}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

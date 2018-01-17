@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj" />
+  </ItemGroup>
+
+</Project>

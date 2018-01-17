@@ -5,4 +5,10 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj" />
+    <ProjectReference Include="..\RedStar.TimesheetGenerator.Excel\RedStar.TimesheetGenerator.Excel.csproj" />
+    <ProjectReference Include="..\RedStar.TimesheetGenerator.Freshbooks\RedStar.TimesheetGenerator.Freshbooks.csproj" />
+  </ItemGroup>
+
 </Project>
