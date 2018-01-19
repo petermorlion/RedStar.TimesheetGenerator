@@ -31,20 +31,16 @@ namespace RedStar.TimesheetGenerator.Freshbooks
             });
 
             return freshbooksEntries
+                .Where(x => x.Date.HasValue && x.Hours.HasValue)
+                .GroupBy(x => x.Date)
                 .Select(x =>
                 {
-                    if (!x.Date.HasValue || !x.Hours.HasValue)
-                    {
-                        return null;
-                    }
-
                     return new TimeTrackingEntry
                     {
-                        Date = x.Date.Value,
-                        Hours = x.Hours.Value
+                        Date = x.Key.Value,
+                        Hours = Math.Round(x.Sum(y => y.Hours.Value), 2)
                     };
                 })
-                .Where(x => x != null)
                 .ToList();
         }
 
