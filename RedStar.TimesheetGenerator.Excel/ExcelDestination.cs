@@ -17,6 +17,11 @@ namespace RedStar.TimesheetGenerator.Excel
         private readonly int _month;
         private readonly int _year;
 
+        private int _daysInMonth;
+        private int _totalsRowIndex;
+        private int _footerRowIndex;
+        private int _grandTotalRowIndex;
+
         public ExcelDestination(FileInfo fileDestination, int month, int year)
         {
             _fileDestination = fileDestination;
@@ -29,6 +34,11 @@ namespace RedStar.TimesheetGenerator.Excel
             using (var excelPackage = new ExcelPackage())
             {
                 var worksheet = excelPackage.Workbook.Worksheets.Add("Timesheet");
+
+                CalculateRowIndexes();
+                SetRowHeights(worksheet);
+                SetPageBorders(worksheet);
+                MergeProjectCells(worksheet);
 
                 var darkBlue = Color.FromArgb(0, 0, 0, 128);
                 worksheet.Cells["A1:M60"].Style.Font.Color.SetColor(darkBlue);
@@ -92,9 +102,8 @@ namespace RedStar.TimesheetGenerator.Excel
                 worksheet.Cells["M17"].Style.TextRotation = 90;
 
                 worksheet.Cells["A17:M17"].Style.Font.Bold = true;
-
-                var daysInMonth = DateTime.DaysInMonth(_year, _month);
-                for (var i = 0; i < daysInMonth; i++)
+                
+                for (var i = 0; i < _daysInMonth; i++)
                 {
                     var rowNumber = 20 + i;
                     var day = 1 + i;
@@ -113,81 +122,133 @@ namespace RedStar.TimesheetGenerator.Excel
                     if (entry != null)
                     {
                         worksheet.Cells[$"F{rowNumber}"].Value = entry.Hours;
+                        worksheet.Cells[$"F{rowNumber}"].Style.Font.Size = 8;
                     }
                 }
 
-                worksheet.Cells[$"A17:M{20 + daysInMonth - 1}"].AddBlackBorder();
+                worksheet.Cells[$"A17:M{20 + _daysInMonth - 1}"].AddBlackBorder();
 
-                var totalsRowIndex = 20 + daysInMonth;
-                worksheet.Cells[$"D{totalsRowIndex}"].Value = "TOTAL";
-                worksheet.Cells[$"D{totalsRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"D{totalsRowIndex}:E{totalsRowIndex}"].Merge = true;
-                worksheet.Cells[$"F{totalsRowIndex}"].Value = entries.Sum(x => x.Hours);
+                worksheet.Cells[$"D{_totalsRowIndex}"].Value = "TOTAL";
+                worksheet.Cells[$"D{_totalsRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[$"D{_totalsRowIndex}:E{_totalsRowIndex}"].Merge = true;
+                worksheet.Cells[$"F{_totalsRowIndex}"].Value = entries.Sum(x => x.Hours);
 
-                worksheet.Cells[$"F{totalsRowIndex}:M{totalsRowIndex}"].AddThickBlackBorder();
+                worksheet.Cells[$"F{_totalsRowIndex}:M{_totalsRowIndex}"].AddThickBlackBorder();
 
-                var grandTotalRowIndex = totalsRowIndex + 1;
-                worksheet.Cells[$"K{grandTotalRowIndex}:L{grandTotalRowIndex}"].Merge = true;
-                worksheet.Cells[$"K{grandTotalRowIndex}:L{grandTotalRowIndex}"].Value = "TOTAL";
-                worksheet.Cells[$"K{grandTotalRowIndex}:L{grandTotalRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"M{grandTotalRowIndex}"].Value = entries.Sum(x => x.Hours);
-                worksheet.Cells[$"M{grandTotalRowIndex}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                worksheet.Cells[$"M{grandTotalRowIndex}"].Style.Fill.BackgroundColor.SetColor(darkBlue);
-                worksheet.Cells[$"M{grandTotalRowIndex}"].Style.Font.Color.SetColor(Color.White);
+                worksheet.Cells[$"K{_grandTotalRowIndex}:L{_grandTotalRowIndex}"].Merge = true;
+                worksheet.Cells[$"K{_grandTotalRowIndex}:L{_grandTotalRowIndex}"].Value = "TOTAL";
+                worksheet.Cells[$"K{_grandTotalRowIndex}:L{_grandTotalRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[$"M{_grandTotalRowIndex}"].Value = entries.Sum(x => x.Hours);
+                worksheet.Cells[$"M{_grandTotalRowIndex}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[$"M{_grandTotalRowIndex}"].Style.Fill.BackgroundColor.SetColor(darkBlue);
+                worksheet.Cells[$"M{_grandTotalRowIndex}"].Style.Font.Color.SetColor(Color.White);
 
-                var footerRowIndex = grandTotalRowIndex + 5;
-                worksheet.Cells[$"B{footerRowIndex}"].Value = "CONSULTANT";
-                worksheet.Cells[$"B{footerRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"A{footerRowIndex + 1}"].Value = "NAME";
-                worksheet.Cells[$"A{footerRowIndex + 1}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"A{footerRowIndex + 1}"].AddBlackBorder();
-                worksheet.Cells[$"B{footerRowIndex + 1}:E{footerRowIndex + 1}"].Merge = true;
-                worksheet.Cells[$"B{footerRowIndex + 1}:E{footerRowIndex + 1}"].AddBlackBorder();
+                worksheet.Cells[$"B{_footerRowIndex}"].Value = "CONSULTANT";
+                worksheet.Cells[$"B{_footerRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[$"A{_footerRowIndex + 1}"].Value = "NAME";
+                worksheet.Cells[$"A{_footerRowIndex + 1}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[$"A{_footerRowIndex + 1}"].AddBlackBorder();
+                worksheet.Cells[$"B{_footerRowIndex + 1}:E{_footerRowIndex + 1}"].Merge = true;
+                worksheet.Cells[$"B{_footerRowIndex + 1}:E{_footerRowIndex + 1}"].AddBlackBorder();
 
-                worksheet.Cells[$"A{footerRowIndex + 2}"].Value = "SIGNATURE";
-                worksheet.Cells[$"A{footerRowIndex + 2}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"A{footerRowIndex + 2}"].AddBlackBorder();
-                worksheet.Cells[$"B{footerRowIndex + 2}:E{footerRowIndex + 2}"].Merge = true;
-                worksheet.Cells[$"B{footerRowIndex + 2}:E{footerRowIndex + 2}"].AddBlackBorder();
+                worksheet.Cells[$"A{_footerRowIndex + 2}"].Value = "SIGNATURE";
+                worksheet.Cells[$"A{_footerRowIndex + 2}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[$"A{_footerRowIndex + 2}"].AddBlackBorder();
+                worksheet.Cells[$"B{_footerRowIndex + 2}:E{_footerRowIndex + 2}"].Merge = true;
+                worksheet.Cells[$"B{_footerRowIndex + 2}:E{_footerRowIndex + 2}"].AddBlackBorder();
 
-                worksheet.Cells[$"I{footerRowIndex}"].Value = "CUSTOMER";
-                worksheet.Cells[$"I{footerRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"G{footerRowIndex + 1}"].Value = "NAME";
-                worksheet.Cells[$"G{footerRowIndex + 1}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"G{footerRowIndex + 1}:H{footerRowIndex + 1}"].AddBlackBorder();
-                worksheet.Cells[$"G{footerRowIndex + 1}:H{footerRowIndex + 1}"].Merge = true;
-                worksheet.Cells[$"I{footerRowIndex + 1}:M{footerRowIndex + 1}"].Merge = true;
-                worksheet.Cells[$"I{footerRowIndex + 1}:M{footerRowIndex + 1}"].AddBlackBorder();
+                worksheet.Cells[$"I{_footerRowIndex}"].Value = "CUSTOMER";
+                worksheet.Cells[$"I{_footerRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[$"G{_footerRowIndex + 1}"].Value = "NAME";
+                worksheet.Cells[$"G{_footerRowIndex + 1}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[$"G{_footerRowIndex + 1}:H{_footerRowIndex + 1}"].AddBlackBorder();
+                worksheet.Cells[$"G{_footerRowIndex + 1}:H{_footerRowIndex + 1}"].Merge = true;
+                worksheet.Cells[$"I{_footerRowIndex + 1}:M{_footerRowIndex + 1}"].Merge = true;
+                worksheet.Cells[$"I{_footerRowIndex + 1}:M{_footerRowIndex + 1}"].AddBlackBorder();
 
-                worksheet.Cells[$"G{footerRowIndex + 2}"].Value = "SIGNATURE";
-                worksheet.Cells[$"G{footerRowIndex + 2}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"G{footerRowIndex + 2}:H{footerRowIndex + 2}"].AddBlackBorder();
-                worksheet.Cells[$"G{footerRowIndex + 2}:H{footerRowIndex + 2}"].Merge = true;
-                worksheet.Cells[$"I{footerRowIndex + 2}:M{footerRowIndex + 2}"].Merge = true;
-                worksheet.Cells[$"I{footerRowIndex + 2}:M{footerRowIndex + 2}"].AddBlackBorder();
+                worksheet.Cells[$"G{_footerRowIndex + 2}"].Value = "SIGNATURE";
+                worksheet.Cells[$"G{_footerRowIndex + 2}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[$"G{_footerRowIndex + 2}:H{_footerRowIndex + 2}"].AddBlackBorder();
+                worksheet.Cells[$"G{_footerRowIndex + 2}:H{_footerRowIndex + 2}"].Merge = true;
+                worksheet.Cells[$"I{_footerRowIndex + 2}:M{_footerRowIndex + 2}"].Merge = true;
+                worksheet.Cells[$"I{_footerRowIndex + 2}:M{_footerRowIndex + 2}"].AddBlackBorder();
 
-                worksheet.Cells[$"A{totalsRowIndex}:M{footerRowIndex + 2}"].Style.Font.Bold = true;
-
-                worksheet.Row(18).Height = 53;
-                worksheet.Row(footerRowIndex + 1).Height = 30;
-                worksheet.Row(footerRowIndex + 2).Height = 30;
-
-                worksheet.Column(1).Width = 10;
-                worksheet.Column(2).Width = 8;
-                worksheet.Column(3).Width = 11.86;
-                worksheet.Column(4).Width = 7.43;
-                worksheet.Column(5).Width = 1.14;
-                worksheet.Column(6).Width = 5.71;
-                worksheet.Column(7).Width = 4.71;
-                worksheet.Column(8).Width = 4.29;
-                worksheet.Column(9).Width = 5;
-                worksheet.Column(10).Width = 5;
-                worksheet.Column(11).Width = 5;
-                worksheet.Column(12).Width = 5;
+                worksheet.Cells[$"A{_totalsRowIndex}:M{_footerRowIndex + 2}"].Style.Font.Bold = true;
+                
+                SetColumnWidths(worksheet);
 
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 excelPackage.SaveAs(_fileDestination);
             }
+        }
+
+        private static void SetColumnWidths(ExcelWorksheet worksheet)
+        {
+            worksheet.Column(1).Width = 10;
+            worksheet.Column(2).Width = 8.12;
+            worksheet.Column(3).Width = 11.88;
+            worksheet.Column(4).Width = 7.41;
+            worksheet.Column(5).Width = 1.24;
+            worksheet.Column(6).Width = 5.82;
+            worksheet.Column(7).Width = 6;
+            worksheet.Column(8).Width = 6;
+            worksheet.Column(9).Width = 5.5;
+            worksheet.Column(10).Width = 5.5;
+            worksheet.Column(11).Width = 5.5;
+            worksheet.Column(12).Width = 5.5;
+            worksheet.Column(13).Width = 5.5;
+        }
+
+        private void MergeProjectCells(ExcelWorksheet worksheet)
+        {
+            for (var i = 20; i <= _totalsRowIndex - 1; i++)
+            {
+                worksheet.Cells[$"B{i}:E{i}"].Merge = true;
+            }
+        }
+
+        private static void SetPageBorders(ExcelWorksheet worksheet)
+        {
+            var topAndBottomPageMargin = (decimal) (1.5 / 2.54);
+            var leftAndRightPageMargin = (decimal) (1 / 2.54);
+            worksheet.PrinterSettings.BottomMargin = topAndBottomPageMargin;
+            worksheet.PrinterSettings.TopMargin = topAndBottomPageMargin;
+            worksheet.PrinterSettings.LeftMargin = leftAndRightPageMargin;
+            worksheet.PrinterSettings.RightMargin = leftAndRightPageMargin;
+        }
+
+        private void CalculateRowIndexes()
+        {
+            _daysInMonth = DateTime.DaysInMonth(_year, _month);
+            _totalsRowIndex = 20 + _daysInMonth;
+            _grandTotalRowIndex = _totalsRowIndex + 1;
+            _footerRowIndex = _grandTotalRowIndex + 2;
+        }
+
+        private void SetRowHeights(ExcelWorksheet worksheet)
+        {
+            for (var i = 1; i <= 7; i++)
+            {
+                worksheet.Row(i).Height = 5;
+            }
+
+            worksheet.Row(8).Height = 17.7;
+
+            for (var i = 9; i <= 16; i++)
+            {
+                worksheet.Row(i).Height = 12.7;
+            }
+
+            worksheet.Row(17).Height = 10.4;
+            worksheet.Row(18).Height = 53;
+
+            for (var i = 19; i <= _footerRowIndex; i++)
+            {
+                worksheet.Row(i).Height = 11.3;
+            }
+
+            worksheet.Row(_footerRowIndex + 1).Height = 30;
+            worksheet.Row(_footerRowIndex + 2).Height = 30;
         }
     }
 }
