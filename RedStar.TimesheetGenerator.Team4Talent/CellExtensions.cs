@@ -2,7 +2,7 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
-namespace RedStar.TimesheetGenerator.Excel
+namespace RedStar.TimesheetGenerator.Team4Talent
 {
     public static class CellExtensions
     {

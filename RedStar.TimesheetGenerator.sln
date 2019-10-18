@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedStar.TimesheetGenerator.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedStar.TimesheetGenerator.Core", "RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj", "{72A19E22-9044-4F0F-85A5-468200E6789F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedStar.TimesheetGenerator.Excel", "RedStar.TimesheetGenerator.Excel\RedStar.TimesheetGenerator.Excel.csproj", "{83D34229-4128-4107-8E2D-C64DA062E697}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedStar.TimesheetGenerator.Team4Talent", "RedStar.TimesheetGenerator.Team4Talent\RedStar.TimesheetGenerator.Team4Talent.csproj", "{83D34229-4128-4107-8E2D-C64DA062E697}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

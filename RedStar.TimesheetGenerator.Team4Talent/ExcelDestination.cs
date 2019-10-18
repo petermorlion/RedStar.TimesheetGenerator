@@ -9,7 +9,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using RedStar.TimesheetGenerator.Core;
 
-namespace RedStar.TimesheetGenerator.Excel
+namespace RedStar.TimesheetGenerator.Team4Talent
 {
     public class ExcelDestination : ITimesheetDestination
     {

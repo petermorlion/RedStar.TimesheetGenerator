@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using RedStar.TimesheetGenerator.Core;
-using RedStar.TimesheetGenerator.Excel;
+using RedStar.TimesheetGenerator.Team4Talent;
 using RedStar.TimesheetGenerator.Freshbooks;
 
 namespace RedStar.TimesheetGenerator.ConsoleApp
