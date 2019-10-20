@@ -11,7 +11,7 @@ using RedStar.TimesheetGenerator.Core;
 
 namespace RedStar.TimesheetGenerator.Team4Talent
 {
-    public class ExcelDestination : ITimesheetDestination
+    public class Team4TalentExcelDestination : ITimesheetDestination
     {
         private readonly FileInfo _fileDestination;
         private readonly int _month;
@@ -22,7 +22,7 @@ namespace RedStar.TimesheetGenerator.Team4Talent
         private int _footerRowIndex;
         private int _grandTotalRowIndex;
 
-        public ExcelDestination(FileInfo fileDestination, int month, int year)
+        public Team4TalentExcelDestination(FileInfo fileDestination, int month, int year)
         {
             _fileDestination = fileDestination;
             _month = month;
