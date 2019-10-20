@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "RedStar.TimesheetGenerator.ConsoleApp": {
+      "commandName": "Project"
+    }
+  }
+}

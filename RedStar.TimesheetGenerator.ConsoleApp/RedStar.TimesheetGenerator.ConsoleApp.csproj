@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj" />
+    <ProjectReference Include="..\RedStar.TimesheetGenerator.MiaaGuard\RedStar.TimesheetGenerator.MiaaGuard.csproj" />
     <ProjectReference Include="..\RedStar.TimesheetGenerator.Team4Talent\RedStar.TimesheetGenerator.Team4Talent.csproj" />
     <ProjectReference Include="..\RedStar.TimesheetGenerator.Freshbooks\RedStar.TimesheetGenerator.Freshbooks.csproj" />
   </ItemGroup>

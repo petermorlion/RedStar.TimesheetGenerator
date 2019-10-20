@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using RedStar.TimesheetGenerator.Core;
 using RedStar.TimesheetGenerator.Team4Talent;
+using RedStar.TimesheetGenerator.MiaaGuard;
 using RedStar.TimesheetGenerator.Freshbooks;
 
 namespace RedStar.TimesheetGenerator.ConsoleApp
@@ -23,7 +25,7 @@ namespace RedStar.TimesheetGenerator.ConsoleApp
             var entries = source.GetEntries(dateFrom, dateTo);
 
             var fileDestination = new FileInfo(args[4]);
-            ITimesheetDestination destination = new ExcelDestination(fileDestination, month, year);
+            ITimesheetDestination destination = new MiaaGuardExcelDestination(fileDestination, month, year);
             destination.CreateTimesheet(entries);
         }
     }
