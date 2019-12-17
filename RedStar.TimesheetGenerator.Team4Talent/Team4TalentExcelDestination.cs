@@ -121,7 +121,7 @@ namespace RedStar.TimesheetGenerator.Team4Talent
                     var entry = entries.SingleOrDefault(x => x.Date == date);
                     if (entry != null)
                     {
-                        worksheet.Cells[$"F{rowNumber}"].Value = entry.Hours;
+                        worksheet.Cells[$"F{rowNumber}"].Value = Math.Round(entry.Hours, 2);
                         worksheet.Cells[$"F{rowNumber}"].Style.Font.Size = 8;
                     }
                 }
@@ -131,14 +131,14 @@ namespace RedStar.TimesheetGenerator.Team4Talent
                 worksheet.Cells[$"D{_totalsRowIndex}"].Value = "TOTAL";
                 worksheet.Cells[$"D{_totalsRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[$"D{_totalsRowIndex}:E{_totalsRowIndex}"].Merge = true;
-                worksheet.Cells[$"F{_totalsRowIndex}"].Value = entries.Sum(x => x.Hours);
+                worksheet.Cells[$"F{_totalsRowIndex}"].Value = entries.Sum(x => Math.Round(x.Hours, 2));
 
                 worksheet.Cells[$"F{_totalsRowIndex}:M{_totalsRowIndex}"].AddThickBlackBorder();
 
                 worksheet.Cells[$"K{_grandTotalRowIndex}:L{_grandTotalRowIndex}"].Merge = true;
                 worksheet.Cells[$"K{_grandTotalRowIndex}:L{_grandTotalRowIndex}"].Value = "TOTAL";
                 worksheet.Cells[$"K{_grandTotalRowIndex}:L{_grandTotalRowIndex}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[$"M{_grandTotalRowIndex}"].Value = entries.Sum(x => x.Hours);
+                worksheet.Cells[$"M{_grandTotalRowIndex}"].Value = entries.Sum(x => Math.Round(x.Hours, 2));
                 worksheet.Cells[$"M{_grandTotalRowIndex}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 worksheet.Cells[$"M{_grandTotalRowIndex}"].Style.Fill.BackgroundColor.SetColor(darkBlue);
                 worksheet.Cells[$"M{_grandTotalRowIndex}"].Style.Font.Color.SetColor(Color.White);

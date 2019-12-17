@@ -39,7 +39,7 @@ namespace RedStar.TimesheetGenerator.Freshbooks
                     return new TimeTrackingEntry
                     {
                         Date = x.Key.Value,
-                        Hours = Math.Round(x.Sum(y => y.Hours.Value), 2)
+                        Hours = x.Sum(y => y.Hours.Value)
                     };
                 })
                 .ToList();

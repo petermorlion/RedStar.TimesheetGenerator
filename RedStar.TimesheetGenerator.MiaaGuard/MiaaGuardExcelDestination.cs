@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -73,7 +74,7 @@ namespace RedStar.TimesheetGenerator.MiaaGuard
 
                     SetCell(worksheet, $"B{rowNumber}", date, 11, black);
                     SetCell(worksheet, $"C{rowNumber}", "Peter Morlion", 11, black);
-                    SetCell(worksheet, $"D{rowNumber}", entry.Hours, 11, black);
+                    SetCell(worksheet, $"D{rowNumber}", Math.Round(entry.Hours, 4), 11, black);
                     SetCell(worksheet, $"E{rowNumber}", "Development", 11, black);
                 }
 
