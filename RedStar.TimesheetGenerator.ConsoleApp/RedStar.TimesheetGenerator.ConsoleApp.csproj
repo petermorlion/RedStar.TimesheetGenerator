@@ -1,15 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj" />
-    <ProjectReference Include="..\RedStar.TimesheetGenerator.MiaaGuard\RedStar.TimesheetGenerator.MiaaGuard.csproj" />
-    <ProjectReference Include="..\RedStar.TimesheetGenerator.Team4Talent\RedStar.TimesheetGenerator.Team4Talent.csproj" />
-    <ProjectReference Include="..\RedStar.TimesheetGenerator.Freshbooks\RedStar.TimesheetGenerator.Freshbooks.csproj" />
   </ItemGroup>
 
 </Project>

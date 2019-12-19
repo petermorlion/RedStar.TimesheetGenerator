@@ -22,12 +22,14 @@ namespace RedStar.TimesheetGenerator.Team4Talent
         private int _footerRowIndex;
         private int _grandTotalRowIndex;
 
-        public Team4TalentExcelDestination(FileInfo fileDestination, int month, int year)
+        public Team4TalentExcelDestination(Options options)
         {
-            _fileDestination = fileDestination;
-            _month = month;
-            _year = year;
+            _fileDestination = options.FileDestination;
+            _month = options.Month;
+            _year = options.Year;
         }
+
+        public string Name => "T4T";
 
         public void CreateTimesheet(IList<TimeTrackingEntry> entries)
         {

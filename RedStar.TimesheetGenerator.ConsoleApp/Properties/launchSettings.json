@@ -1,7 +1,8 @@
 {
   "profiles": {
     "RedStar.TimesheetGenerator.ConsoleApp": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "freshbooks miaa 201911 \"C:\\Users\\peter\\OneDrive\\Documenten\\Red Star IT\\miaaGuard\\Timesheets\\2019-11-test.xlsx\""
     }
   }
 }

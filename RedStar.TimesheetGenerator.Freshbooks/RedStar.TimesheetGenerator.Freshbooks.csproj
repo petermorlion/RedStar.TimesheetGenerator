@@ -1,7 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputPath>C:\Users\peter\Projects\RedStar.TimesheetGenerator\RedStar.TimesheetGenerator.ConsoleApp\bin\$(Configuration)\netcoreapp3.0\plugins\Freshbooks\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj" />
+    <ProjectReference Include="..\RedStar.TimesheetGenerator.Core\RedStar.TimesheetGenerator.Core.csproj">
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

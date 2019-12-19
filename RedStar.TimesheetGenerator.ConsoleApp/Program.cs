@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using RedStar.TimesheetGenerator.Core;
-using RedStar.TimesheetGenerator.Team4Talent;
-using RedStar.TimesheetGenerator.MiaaGuard;
-using RedStar.TimesheetGenerator.Freshbooks;
 
 namespace RedStar.TimesheetGenerator.ConsoleApp
 {
@@ -12,21 +11,83 @@ namespace RedStar.TimesheetGenerator.ConsoleApp
     {
         static void Main(string[] args)
         {
-            ITimeTrackingSource source = new FreshbooksSource(args[0], args[1], args[2]);
+            try
+            {
+                var sourceName = args[0];
+                var destinationName = args[1];
+                var dateArg = args[2];
+                var destination = args[3];
 
-            var dateArg = args[3];
-            // TODO: validate dateArg
+                var options = new Options
+                {
+                    FileDestination = new FileInfo(destination),
+                    Year = int.Parse(dateArg.Substring(0, 4)),
+                    Month = int.Parse(dateArg.Substring(4, 2))
+                };
 
-            var year = int.Parse(dateArg.Substring(0, 4));
-            var month = int.Parse(dateArg.Substring(4, 2));
-            var dateFrom = new DateTime(year, month, 1);
-            var dateTo = new DateTime(year, month, DateTime.DaysInMonth(year, month));
+                var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var possiblePluginPaths = Directory.EnumerateFiles(currentPath, "*.dll", SearchOption.AllDirectories);
 
-            var entries = source.GetEntries(dateFrom, dateTo);
+                var possiblePluginAssemblies = possiblePluginPaths.Select(LoadPlugin);
 
-            var fileDestination = new FileInfo(args[4]);
-            ITimesheetDestination destination = new MiaaGuardExcelDestination(fileDestination, month, year);
-            destination.CreateTimesheet(entries);
+                var source = GetPlugin<ITimeTrackingSource>(possiblePluginAssemblies, sourceName, options);
+
+                if (source == null)
+                {
+                    Console.WriteLine($"No source found with name '{sourceName}'.");
+                    Environment.Exit(-1);
+                }
+
+                var destinationPlugin = GetPlugin<ITimesheetDestination>(possiblePluginAssemblies, destinationName, options);
+
+                if (destinationPlugin == null)
+                {
+                    Console.WriteLine($"No destination found with name '{destinationName}'.");
+                    Environment.Exit(-1);
+                }
+
+                var entries = source.GetEntries();
+
+                destinationPlugin.CreateTimesheet(entries);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        private static T GetPlugin<T>(IEnumerable<Assembly> possiblePluginAssemblies, string pluginName, Options options) where T : IPlugin
+        {
+            var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var possiblePluginPaths = Directory.EnumerateFiles(currentPath, "*.dll", SearchOption.AllDirectories);
+
+            var result = possiblePluginAssemblies
+                .SelectMany(assembly => CreatePlugin<T>(assembly, options))
+                .FirstOrDefault(x => x.Name.ToLower() == pluginName.ToLower());
+
+            return result;
+        }
+
+        static Assembly LoadPlugin(string pluginLocation)
+        {
+            Console.WriteLine($"Loading DLL: {pluginLocation}");
+            var loadContext = new PluginLoadContext(pluginLocation);
+            return loadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginLocation)));
+        }
+
+        static IEnumerable<T> CreatePlugin<T>(Assembly assembly, Options options) where T : IPlugin
+        {
+            foreach (var type in assembly.GetTypes())
+            {
+                if (typeof(T).IsAssignableFrom(type))
+                {
+                    Console.WriteLine($"Found plugin {type.Name}");
+                    if (Activator.CreateInstance(type, options) is T result)
+                    {
+                        yield return result;
+                    }
+                }
+             }
         }
     }
 }

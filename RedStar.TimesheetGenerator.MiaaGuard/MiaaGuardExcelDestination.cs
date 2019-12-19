@@ -17,11 +17,11 @@ namespace RedStar.TimesheetGenerator.MiaaGuard
         private readonly int _month;
         private readonly int _year;
 
-        public MiaaGuardExcelDestination(FileInfo fileDestination, int month, int year)
+        public MiaaGuardExcelDestination(Options options)
         {
-            _fileDestination = fileDestination;
-            _month = month;
-            _year = year;
+            _fileDestination = options.FileDestination;
+            _month = options.Month;
+            _year = options.Year;
         }
 
         private void SetCell(ExcelWorksheet worksheet, string cellIdentifier, object text, int size, Color color, Color? backgroundColor = null)
@@ -38,6 +38,8 @@ namespace RedStar.TimesheetGenerator.MiaaGuard
                 cell.Style.Fill.BackgroundColor.SetColor(backgroundColor.Value);
             }
         }
+
+        public string Name => "miaa";
 
         public void CreateTimesheet(IList<TimeTrackingEntry> entries)
         {
