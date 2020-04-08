@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="5.0.4" />
+    <PackageReference Include="EPPlus" Version="5.1.0" />
   </ItemGroup>
 
   <ItemGroup>
