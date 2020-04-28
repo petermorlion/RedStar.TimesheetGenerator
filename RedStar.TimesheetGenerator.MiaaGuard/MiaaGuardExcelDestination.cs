@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -31,7 +30,7 @@ namespace RedStar.TimesheetGenerator.MiaaGuard
             cell.Value = text;
             cell.Style.Font.Size = size;
             cell.Style.Font.Color.SetColor(color);
-            cell.Style.Font.Name = "Helvetica Neue Light";
+            cell.Style.Font.Name = "Montserrat Regular";
             if (backgroundColor.HasValue)
             {
                 cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -43,62 +42,75 @@ namespace RedStar.TimesheetGenerator.MiaaGuard
 
         public void CreateTimesheet(IList<TimeTrackingEntry> entries)
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             using (var excelPackage = new ExcelPackage())
             {
-                var worksheet = excelPackage.Workbook.Worksheets.Add("Timesheet");
-                var red = Color.FromArgb(0, 128, 0, 0);
+                var worksheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
                 var black = Color.Black;
                 var white = Color.White;
-                SetCell(worksheet, "A7", "Timesheet", 36, red);
+                SetCell(worksheet, "B7", "Timesheet", 36, black);
                 
-                SetCell(worksheet, "A9", "Project:", 11, black);
-                SetCell(worksheet, "B9", "reference to Annex", 11, black);
-                SetCell(worksheet, "B9", "", 11, black);
-                SetCell(worksheet, "A10", "Period:", 11, black);
-                SetCell(worksheet, "B10", $"{_month} {_year}", 11, black);
-                SetCell(worksheet, "A11", "Consultant:", 11, black);
-                SetCell(worksheet, "B11", "Peter Morlion", 11, black);
-                SetCell(worksheet, "A12", "Reporting:", 11, black);
-                SetCell(worksheet, "B12", $"{_month} {_year}", 11, black);
+                SetCell(worksheet, "B9", "Project:", 11, black);
+                SetCell(worksheet, "C9", "reference to Annex", 11, black);
+                SetCell(worksheet, "B10", "Period:", 11, black);
+                SetCell(worksheet, "C10", new DateTime(_year, _month, 1), 11, black);
+                SetCell(worksheet, "B11", "Consultant:", 11, black);
+                SetCell(worksheet, "C11", "Peter Morlion", 11, black);
+                SetCell(worksheet, "B12", "Reporting:", 11, black);
+                SetCell(worksheet, "C12", new DateTime(_year, _month, 1), 11, black);
                 
-                SetCell(worksheet, "A15", "Week", 11, white, red);
-                SetCell(worksheet, "B15", "Date", 11, white, red);
-                SetCell(worksheet, "C15", "Consultant", 11, white, red);
-                SetCell(worksheet, "D15", "# manhours", 11, white, red);
-                SetCell(worksheet, "E15", "Task", 11, white, red);
+                SetCell(worksheet, "B15", "Week", 11, white, black);
+                SetCell(worksheet, "C15", "Date", 11, white, black);
+                SetCell(worksheet, "D15", "Consultant", 11, white, black);
+                SetCell(worksheet, "E15", "# manhours", 11, white, black);
+                SetCell(worksheet, "F15", "Task", 11, white, black);
+                SetCell(worksheet, "G15", "Details", 11, white, black);
 
                 var orderedEntries = entries.OrderBy(x => x.Date).ToList();
+                var rowNumber = 16;
                 for (var i = 0; i < orderedEntries.Count; i++)
                 {
-                    var rowNumber = 16 + i;
+                    rowNumber += 1;
                     var entry = orderedEntries[i];
                     var date = entry.Date;
+                    var task = entry.Task;
+                    var details = entry.Details;
 
-                    SetCell(worksheet, $"B{rowNumber}", date, 11, black);
-                    SetCell(worksheet, $"C{rowNumber}", "Peter Morlion", 11, black);
-                    SetCell(worksheet, $"D{rowNumber}", Math.Round(entry.Hours, 4), 11, black);
-                    SetCell(worksheet, $"E{rowNumber}", "Development", 11, black);
+                    SetCell(worksheet, $"C{rowNumber}", date, 11, black);
+                    SetCell(worksheet, $"D{rowNumber}", "Peter Morlion", 11, black);
+                    SetCell(worksheet, $"E{rowNumber}", Math.Round(entry.Hours, 4), 11, black);
+                    SetCell(worksheet, $"F{rowNumber}", task, 11, black);
+                    SetCell(worksheet, $"G{rowNumber}", details, 11, black);
                 }
 
-                SetCell(worksheet, "D38", "Total # manhours:", 11, black);
-                SetCell(worksheet, "D39", "Total # mandays:", 11, black);
-                SetCell(worksheet, "D40", "Total # days invoiced:", 11, black);
-                worksheet.Cells["D38"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                worksheet.Cells["D39"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                worksheet.Cells["D40"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                worksheet.Cells["E38"].Formula = "=SUM(D16:D35)";
-                worksheet.Cells["E38"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                worksheet.Cells["E39"].Formula = "=E38/8";
-                worksheet.Cells["E39"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                worksheet.Cells["E40"].Formula = "=E39";
-                worksheet.Cells["E40"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                worksheet.Cells["F39"].Formula = "=E39*1100";
+                rowNumber += 3;
+
+                SetCell(worksheet, $"E{rowNumber}", "Total # manhours:", 11, black);
+                worksheet.Cells[$"E{rowNumber}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                worksheet.Cells[$"F{rowNumber}"].Formula = $"=SUM(E16:E{rowNumber - 2})";
+                worksheet.Cells[$"F{rowNumber}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Cells[$"F{rowNumber}"].Style.Font.Size = 11;
+                worksheet.Cells[$"F{rowNumber}"].Style.Font.Name = "Montserrat Regular";
+
+                SetCell(worksheet, $"E{rowNumber + 1}", "Total # mandays:", 11, black);
+                worksheet.Cells[$"E{rowNumber + 1}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                worksheet.Cells[$"F{rowNumber + 1}"].Formula = $"=SUM(F{rowNumber}/8)";
+                worksheet.Cells[$"F{rowNumber + 1}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Cells[$"F{rowNumber + 1}"].Style.Font.Size = 11;
+                worksheet.Cells[$"F{rowNumber + 1}"].Style.Font.Name = "Montserrat Regular";
+
+                SetCell(worksheet, $"E{rowNumber + 2}", "Total # days invoiced:", 11, black);
+                worksheet.Cells[$"E{rowNumber + 2}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                worksheet.Cells[$"F{rowNumber + 2}"].Formula = $"=F{rowNumber + 1}";
+                worksheet.Cells[$"F{rowNumber + 2}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Cells[$"F{rowNumber + 2}"].Style.Font.Size = 11;
+                worksheet.Cells[$"F{rowNumber + 2}"].Style.Font.Name = "Montserrat Regular";
 
                 SetRowHeights(worksheet);
-                SetDateFormats(worksheet);
+                SetDateFormats(worksheet, rowNumber);
                 SetColumnWidths(worksheet);
-                SetTimeEntryBorders(worksheet);
-                AddLogo(worksheet);
+                SetTimeEntryBorders(worksheet, rowNumber);
 
                 worksheet.Row(15).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
@@ -107,25 +119,14 @@ namespace RedStar.TimesheetGenerator.MiaaGuard
             }
         }
 
-        private void SetDateFormats(ExcelWorksheet worksheet)
+        private void SetDateFormats(ExcelWorksheet worksheet, int numberOfRows)
         {
-            for (var i = 16; i <= 35; i++)
-            {
-                worksheet.Cells[$"B{i}"].Style.Numberformat.Format = "d-mmm-yy";
-            }
-        }
+            worksheet.Cells["C10"].Style.Numberformat.Format = "dd/mm/yyyy";
+            worksheet.Cells["C12"].Style.Numberformat.Format = "mmm-yy";
 
-        private static void AddLogo(ExcelWorksheet worksheet)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "RedStar.TimesheetGenerator.MiaaGuard.logo.png";
-
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            for (var i = 16; i <= numberOfRows; i++)
             {
-                var image = new Bitmap(stream);
-                var logo = worksheet.Drawings.AddPicture("logo", image);
-                logo.SetSize(65);
-                logo.SetPosition(0, 350);
+                worksheet.Cells[$"C{i}"].Style.Numberformat.Format = "dd/mm/yyyy";
             }
         }
 
@@ -147,21 +148,20 @@ namespace RedStar.TimesheetGenerator.MiaaGuard
 
         private static void SetColumnWidths(ExcelWorksheet worksheet)
         {
-            worksheet.Column(1).Width = 11;
-            worksheet.Column(2).Width = 11;
-            worksheet.Column(3).Width = 11;
-            worksheet.Column(4).Width = 11;
-            worksheet.Column(5).Width = 52;
-            worksheet.Column(6).Width = 11;
+            worksheet.Column(1).Width = 6;
+            worksheet.Column(2).Width = 34;
+            worksheet.Column(3).Width = 18;
+            worksheet.Column(4).Width = 15;
+            worksheet.Column(5).Width = 19;
+            worksheet.Column(6).Width = 37;
+            worksheet.Column(7).Width = 33;
         }
 
-        private void SetTimeEntryBorders(ExcelWorksheet worksheet)
+        private void SetTimeEntryBorders(ExcelWorksheet worksheet, int numberOfRows)
         {
             var borderColor = Color.Black;
-            for (var i = 15; i <= 34; i++)
+            for (var i = 15; i <= numberOfRows - 3; i++)
             {
-                worksheet.Cells[$"A{i}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[$"A{i}"].Style.Border.Bottom.Color.SetColor(borderColor);
                 worksheet.Cells[$"B{i}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 worksheet.Cells[$"B{i}"].Style.Border.Bottom.Color.SetColor(borderColor);
                 worksheet.Cells[$"C{i}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -170,19 +170,24 @@ namespace RedStar.TimesheetGenerator.MiaaGuard
                 worksheet.Cells[$"D{i}"].Style.Border.Bottom.Color.SetColor(borderColor);
                 worksheet.Cells[$"E{i}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 worksheet.Cells[$"E{i}"].Style.Border.Bottom.Color.SetColor(borderColor);
+                worksheet.Cells[$"F{i}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[$"F{i}"].Style.Border.Bottom.Color.SetColor(borderColor);
+                worksheet.Cells[$"G{i}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[$"G{i}"].Style.Border.Bottom.Color.SetColor(borderColor);
             }
 
-            var red = Color.FromArgb(0, 128, 0, 0);
-            worksheet.Cells["A35"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
-            worksheet.Cells["A35"].Style.Border.Bottom.Color.SetColor(red);
-            worksheet.Cells["B35"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
-            worksheet.Cells["B35"].Style.Border.Bottom.Color.SetColor(red);
-            worksheet.Cells["C35"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
-            worksheet.Cells["C35"].Style.Border.Bottom.Color.SetColor(red);
-            worksheet.Cells["D35"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
-            worksheet.Cells["D35"].Style.Border.Bottom.Color.SetColor(red);
-            worksheet.Cells["E35"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
-            worksheet.Cells["E35"].Style.Border.Bottom.Color.SetColor(red);
+            worksheet.Cells[$"B{numberOfRows - 3}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+            worksheet.Cells[$"B{numberOfRows - 3}"].Style.Border.Bottom.Color.SetColor(borderColor);
+            worksheet.Cells[$"C{numberOfRows - 3}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+            worksheet.Cells[$"C{numberOfRows - 3}"].Style.Border.Bottom.Color.SetColor(borderColor);
+            worksheet.Cells[$"D{numberOfRows - 3}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+            worksheet.Cells[$"D{numberOfRows - 3}"].Style.Border.Bottom.Color.SetColor(borderColor);
+            worksheet.Cells[$"E{numberOfRows - 3}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+            worksheet.Cells[$"E{numberOfRows - 3}"].Style.Border.Bottom.Color.SetColor(borderColor);
+            worksheet.Cells[$"F{numberOfRows - 3}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+            worksheet.Cells[$"F{numberOfRows - 3}"].Style.Border.Bottom.Color.SetColor(borderColor);
+            worksheet.Cells[$"G{numberOfRows - 3}"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+            worksheet.Cells[$"G{numberOfRows - 3}"].Style.Border.Bottom.Color.SetColor(borderColor);
         }
     }
 }

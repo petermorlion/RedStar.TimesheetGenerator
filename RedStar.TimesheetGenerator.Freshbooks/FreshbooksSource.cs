@@ -11,7 +11,7 @@ namespace RedStar.TimesheetGenerator.Freshbooks
     {
         private readonly string _username;
         private readonly string _token;
-        private readonly string _projectId;
+        private readonly string _projectIds;
         private FreshBooksApi _freshbooks;
         private DateTime _dateFrom;
         private DateTime _dateTo;
@@ -20,7 +20,7 @@ namespace RedStar.TimesheetGenerator.Freshbooks
         {
             _username = Environment.GetEnvironmentVariable("freshbooks_username");
             _token = Environment.GetEnvironmentVariable("freshbooks_token");
-            _projectId = Environment.GetEnvironmentVariable("freshbooks_projectid");
+            _projectIds = Environment.GetEnvironmentVariable("freshbooks_projectids");
             _dateFrom = new DateTime(options.Year, options.Month, 1);
             _dateTo = new DateTime(options.Year, options.Month, DateTime.DaysInMonth(options.Year, options.Month));
         }
@@ -29,25 +29,39 @@ namespace RedStar.TimesheetGenerator.Freshbooks
 
         public IList<TimeTrackingEntry> GetEntries()
         {
-            var freshbooksEntries = Freshbooks.TimeEntries.SearchAll(new TimeEntryFilter
-            {
-                ProjectId = _projectId,
-                DateFrom = _dateFrom,
-                DateTo = _dateTo
-            });
+            var result = new List<TimeTrackingEntry>();
 
-            return freshbooksEntries
-                .Where(x => x.Date.HasValue && x.Hours.HasValue)
-                .GroupBy(x => x.Date)
-                .Select(x =>
+            var projects = Freshbooks.Projects.GetAllPages().ToDictionary(x => x.Id, x => x.Name);
+            var tasks = Freshbooks.Tasks.GetAllPages().ToDictionary(x => x.Id, x => x.Name);
+
+            var projectIdList = _projectIds.Split(",").Select(x => x.Trim()).ToList();
+            foreach (var projectId in projectIdList)
+            {
+                var freshbooksEntries = Freshbooks.TimeEntries.SearchAll(new TimeEntryFilter
                 {
-                    return new TimeTrackingEntry
+                    ProjectId = projectId,
+                    DateFrom = _dateFrom,
+                    DateTo = _dateTo
+                });
+
+                var projectResult = freshbooksEntries
+                    .Where(x => x.Date.HasValue && x.Hours.HasValue)
+                    .Select(x =>
                     {
-                        Date = x.Key.Value,
-                        Hours = x.Sum(y => y.Hours.Value)
-                    };
-                })
-                .ToList();
+                        return new TimeTrackingEntry
+                        {
+                            Date = x.Date.Value,
+                            Hours = x.Hours.Value,
+                            Task = projects[x.ProjectId].Replace("SA | ", ""),
+                            Details = tasks[x.TaskId]
+                        };
+                    })
+                    .ToList();
+
+                result.AddRange(projectResult);
+            }
+
+            return result;
         }
 
         private FreshBooksApi Freshbooks => _freshbooks ?? (_freshbooks = FreshBooksApi.Build(_username, _token));

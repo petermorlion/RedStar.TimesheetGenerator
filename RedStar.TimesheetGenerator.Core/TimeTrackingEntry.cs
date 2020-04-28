@@ -6,5 +6,7 @@ namespace RedStar.TimesheetGenerator.Core
     {
         public DateTime Date { get; set; }
         public double Hours { get; set; }
+        public string Task { get; set; }
+        public string Details { get; set; }
     }
 }
