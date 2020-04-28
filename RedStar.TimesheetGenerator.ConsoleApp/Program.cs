@@ -58,9 +58,6 @@ namespace RedStar.TimesheetGenerator.ConsoleApp
 
         private static T GetPlugin<T>(IEnumerable<Assembly> possiblePluginAssemblies, string pluginName, Options options) where T : IPlugin
         {
-            var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var possiblePluginPaths = Directory.EnumerateFiles(currentPath, "*.dll", SearchOption.AllDirectories);
-
             var result = possiblePluginAssemblies
                 .SelectMany(assembly => CreatePlugin<T>(assembly, options))
                 .FirstOrDefault(x => x.Name.ToLower() == pluginName.ToLower());
