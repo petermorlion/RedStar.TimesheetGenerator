@@ -37,31 +37,44 @@ namespace RedStar.TimesheetGenerator.Freshbooks
             var projectIdList = _projectIds.Split(",").Select(x => x.Trim()).ToList();
             foreach (var projectId in projectIdList)
             {
-                var freshbooksEntries = Freshbooks.TimeEntries.SearchAll(new TimeEntryFilter
+                try
                 {
-                    ProjectId = projectId,
-                    DateFrom = _dateFrom,
-                    DateTo = _dateTo
-                });
-
-                var projectResult = freshbooksEntries
-                    .Where(x => x.Date.HasValue && x.Hours.HasValue)
-                    .Select(x =>
+                    var freshbooksEntries = Freshbooks.TimeEntries.SearchAll(new TimeEntryFilter
                     {
-                        return new TimeTrackingEntry
-                        {
-                            Date = x.Date.Value,
-                            Hours = x.Hours.Value,
-                            Task = projects[x.ProjectId].Replace("SA | ", ""),
-                            Details = tasks[x.TaskId]
-                        };
-                    })
-                    .ToList();
+                        ProjectId = projectId,
+                        DateFrom = _dateFrom,
+                        DateTo = _dateTo
+                    });
 
-                result.AddRange(projectResult);
+                    var projectResult = freshbooksEntries
+                        .GroupBy(x => x.Id)
+                        .Select(x => x.First())
+                        .Where(x => x.Date.HasValue && x.Hours.HasValue)
+                        .Select(x =>
+                        {
+                            return new TimeTrackingEntry
+                            {
+                                Date = x.Date.Value,
+                                Hours = x.Hours.Value,
+                                Task = projects[x.ProjectId].Replace("SA | ", ""),
+                                Details = tasks[x.TaskId]
+                            };
+                        })
+                        .ToList();
+
+                    result.AddRange(projectResult);
+                }
+                catch (NullReferenceException e)
+                {
+                    continue;
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
             }
 
-            return result;
+            return result.OrderBy(x => x.Date).ToList();
         }
 
         private FreshBooksApi Freshbooks => _freshbooks ?? (_freshbooks = FreshBooksApi.Build(_username, _token));

@@ -2,10 +2,10 @@
   "profiles": {
     "RedStar.TimesheetGenerator.ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "freshbooks miaa 202004 \"C:\\Users\\peter\\OneDrive\\Documenten\\Red Star IT\\miaaGuard\\Timesheets\\2020-04-test.xlsx\"",
+      "commandLineArgs": "freshbooks miaa 202007 \"C:\\Users\\peter\\OneDrive\\Documenten\\Red Star IT\\miaaGuard\\Timesheets\\2020-07-test.xlsx\"",
       "environmentVariables": {
         "freshbooks_username": "redstarit",
-        "freshbooks_projectids": "64873, 64793, 64791, 64789"
+        "freshbooks_projectids": "64873, 64793, 64791, 64789, 65467"
       }
     }
   }
