@@ -20,7 +20,7 @@ namespace RedStar.TimesheetGenerator.Freshbooks
         public FreshbooksSource(Options options)
         {
             _dateFrom = new DateTime(options.Year, options.Month, 1);
-            _dateTo = new DateTime(options.Year, options.Month, DateTime.DaysInMonth(options.Year, options.Month));
+            _dateTo = new DateTime(options.Year, options.Month, DateTime.DaysInMonth(options.Year, options.Month), 23, 59, 59);
             _clientId = Environment.GetEnvironmentVariable("freshbooks_client_id");
             _businessId = Environment.GetEnvironmentVariable("freshbooks_business_id");
         }
