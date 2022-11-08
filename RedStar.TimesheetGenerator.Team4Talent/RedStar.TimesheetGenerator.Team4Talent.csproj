@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="5.8.2" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
